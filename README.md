@@ -1,3 +1,5 @@
+#致谢张咋了开源的codebase-to-course ： https://github.com/zarazhangrui/codebase-to-course
+
 # paper-reading
 
 A Codex skill for reading research papers and turning them into decision-grade analysis, not abstract rewrites.
