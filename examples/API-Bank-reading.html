@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API-Bank 论文导读</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #faf7f2;
+      --color-bg-warm: #f3ece2;
+      --color-bg-code: #1e1e2e;
+      --color-text: #2c2a28;
+      --color-text-secondary: #6b6560;
+      --color-text-muted: #9e9790;
+      --color-border: #e5dfd6;
+      --color-surface: #ffffff;
+      --color-surface-warm: #fdf9f3;
+      --color-accent: #cb5a2e;
+      --color-accent-hover: #b54c24;
+      --color-accent-light: #fbe9e2;
+      --color-info: #2a7b9b;
+      --color-info-light: #e4f2f7;
+      --color-success: #2d8b55;
+      --color-success-light: #e8f5ee;
+      --color-error: #c93b3b;
+      --color-error-light: #fde8e8;
+      --shadow-sm: 0 1px 2px rgba(44, 42, 40, 0.05);
+      --shadow-md: 0 6px 18px rgba(44, 42, 40, 0.08);
+      --shadow-lg: 0 18px 42px rgba(44, 42, 40, 0.12);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --nav-height: 56px;
+      --content-width: 1120px;
+      --font-display: "Bricolage Grotesque", Georgia, serif;
+      --font-body: "DM Sans", -apple-system, sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-normal: 320ms;
+      --duration-slow: 560ms;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background:
+        radial-gradient(circle at top right, rgba(203, 90, 46, 0.1), transparent 25%),
+        radial-gradient(circle at left 20%, rgba(42, 123, 155, 0.09), transparent 20%),
+        linear-gradient(180deg, #faf7f2 0%, #f6f0e7 100%);
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      height: var(--nav-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: rgba(250, 247, 242, 0.86);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(229, 223, 214, 0.9);
+    }
+
+    .topbar .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      font-size: 0.95rem;
+    }
+
+    .topbar nav {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .topbar a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      padding: 7px 10px;
+      border-radius: 999px;
+      transition: background var(--duration-normal), color var(--duration-normal);
+    }
+
+    .topbar a:hover,
+    .topbar a.active {
+      color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: calc(var(--nav-height) + 48px) 24px 72px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section:nth-of-type(odd) { background: transparent; }
+    .section:nth-of-type(even) { background: rgba(245, 240, 232, 0.68); }
+
+    .container {
+      width: min(100%, var(--content-width));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent);
+      background: var(--color-accent-light);
+      border: 1px solid rgba(203, 90, 46, 0.15);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+
+    h1, h2, h3 {
+      font-family: var(--font-display);
+      line-height: 1.08;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 8vw, 5.3rem);
+      max-width: 10ch;
+      margin-top: 18px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      margin-bottom: 18px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      line-height: 1.7;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    .hero-grid,
+    .split-grid,
+    .stats-grid,
+    .cards-grid,
+    .result-grid,
+    .takeaway-grid,
+    .quiz-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.25fr 0.9fr;
+      align-items: end;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-summary {
+      font-size: 1.1rem;
+      max-width: 62ch;
+    }
+
+    .paper-card,
+    .note-card,
+    .stat-card,
+    .ability-card,
+    .result-card,
+    .takeaway-card,
+    .quiz-card,
+    .pipeline-card,
+    .callout {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+    }
+
+    .paper-card {
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .paper-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .meta-block {
+      padding: 12px 14px;
+      background: var(--color-surface-warm);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .meta-block span {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-bottom: 6px;
+    }
+
+    .meta-block strong {
+      font-size: 0.96rem;
+      color: var(--color-text);
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 28px;
+    }
+
+    .stat-card {
+      padding: 22px 20px;
+    }
+
+    .stat-card .value {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-accent);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .label {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .split-grid {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .callout {
+      padding: 24px;
+      border-left: 5px solid var(--color-accent);
+    }
+
+    .cards-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .note-card {
+      padding: 22px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .note-card strong {
+      font-size: 1rem;
+    }
+
+    .ability-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0 24px;
+    }
+
+    .ability-btn,
+    .pipeline-btn,
+    .quiz-option,
+    .ghost-btn {
+      appearance: none;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+
+    .ability-btn.active,
+    .ability-btn:hover,
+    .pipeline-btn.active,
+    .pipeline-btn:hover,
+    .ghost-btn:hover {
+      border-color: rgba(203, 90, 46, 0.3);
+      background: var(--color-accent-light);
+      color: var(--color-accent);
+    }
+
+    .ability-panel {
+      display: none;
+    }
+
+    .ability-panel.active {
+      display: block;
+    }
+
+    .ability-card {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .metric-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: var(--color-text-secondary);
+    }
+
+    .bar {
+      height: 12px;
+      background: #efe7dc;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(44, 42, 40, 0.06);
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--color-accent), #e49a73);
+    }
+
+    .pipeline-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: start;
+      margin-top: 22px;
+    }
+
+    .pipeline-menu {
+      display: grid;
+      gap: 10px;
+    }
+
+    .pipeline-btn {
+      text-align: left;
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .pipeline-card {
+      padding: 26px;
+      display: none;
+      gap: 16px;
+    }
+
+    .pipeline-card.active {
+      display: grid;
+    }
+
+    .pipeline-step {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--color-info);
+    }
+
+    .result-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+
+    .result-card {
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .result-card .score {
+      font-family: var(--font-display);
+      font-size: 2.3rem;
+      font-weight: 800;
+    }
+
+    .result-card .tag {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .table-wrap {
+      margin-top: 24px;
+      overflow: auto;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border);
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      background: #faf5ee;
+    }
+
+    .error-tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .error-panel {
+      display: none;
+    }
+
+    .error-panel.active {
+      display: block;
+    }
+
+    .error-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .error-item {
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .error-item strong {
+      color: var(--color-text);
+    }
+
+    .takeaway-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+
+    .takeaway-card {
+      padding: 24px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+
+    .quiz-card {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .quiz-option {
+      width: 100%;
+      border-radius: 14px;
+      padding: 12px 14px;
+      text-align: left;
+      margin-bottom: 8px;
+    }
+
+    .quiz-option.correct {
+      background: var(--color-success-light);
+      border-color: rgba(45, 139, 85, 0.25);
+      color: var(--color-success);
+    }
+
+    .quiz-option.wrong {
+      background: var(--color-error-light);
+      border-color: rgba(201, 59, 59, 0.22);
+      color: var(--color-error);
+    }
+
+    .quiz-feedback {
+      min-height: 64px;
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity var(--duration-slow) var(--ease-out),
+                  transform var(--duration-slow) var(--ease-out);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid,
+      .split-grid,
+      .pipeline-layout,
+      .cards-grid,
+      .result-grid,
+      .takeaway-grid,
+      .quiz-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .paper-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        height: auto;
+        padding: 14px;
+        align-items: flex-start;
+        gap: 10px;
+        flex-direction: column;
+      }
+
+      .section {
+        padding-top: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">API-Bank 论文导读</div>
+    <nav>
+      <a href="#hero">开场</a>
+      <a href="#problem">问题</a>
+      <a href="#abilities">能力拆分</a>
+      <a href="#pipeline">数据生成</a>
+      <a href="#results">结果</a>
+      <a href="#errors">错误分析</a>
+      <a href="#takeaways">结论</a>
+      <a href="#quiz">测一测</a>
+    </nav>
+  </header>
+
+  <section class="section" id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow">EMNLP 2023 · Benchmark / Tool Use</div>
+          <h1>API-Bank</h1>
+          <p class="hero-summary">
+            这篇论文不是单纯在说“模型会不会调用 API”，而是在问一个更接近真实 agent 的问题：
+            模型能不能先判断要不要用工具、找对工具、再把多步调用串起来完成任务。
+          </p>
+          <div class="callout">
+            <h3>一句话 thesis</h3>
+            <p>
+              API-Bank 通过一个可执行 benchmark、一个大规模 tool-use 训练集，以及细粒度错误分析，
+              把 tool-augmented LLM 的能力从“格式对不对”推进到“真实任务到底能不能完成”。
+            </p>
+          </div>
+        </div>
+
+        <div class="paper-card reveal">
+          <h3>论文卡片</h3>
+          <div class="paper-meta">
+            <div class="meta-block">
+              <span>Title</span>
+              <strong>API-Bank: A Comprehensive Benchmark for Tool-Augmented LLMs</strong>
+            </div>
+            <div class="meta-block">
+              <span>Artifact</span>
+              <strong>Benchmark + Training Set + Fine-tuned Model</strong>
+            </div>
+            <div class="meta-block">
+              <span>Main Question</span>
+              <strong>LLM 到底多会用工具？</strong>
+            </div>
+            <div class="meta-block">
+              <span>Why It Matters</span>
+              <strong>适合 agent / tool-use / API 调用体系设计</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid reveal">
+        <div class="stat-card">
+          <div class="label">Training Domains</div>
+          <div class="value">1,000</div>
+          <p>覆盖广泛 domain，而不是只测少数固定场景。</p>
+        </div>
+        <div class="stat-card">
+          <div class="label">Training APIs</div>
+          <div class="value">2,138</div>
+          <p>API 丰富度是它区别于许多早期 benchmark 的关键。</p>
+        </div>
+        <div class="stat-card">
+          <div class="label">Eval APIs</div>
+          <div class="value">73</div>
+          <p>评测集是人工构造并可执行的，不只是文本对齐。</p>
+        </div>
+        <div class="stat-card">
+          <div class="label">Eval Dialogues</div>
+          <div class="value">314</div>
+          <p>多轮、多调用、真实风格对话，比单轮模板更接近 agent。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="problem">
+    <div class="container split-grid">
+      <div class="reveal">
+        <div class="eyebrow">Problem Framing</div>
+        <h2>它到底想补什么缺口？</h2>
+        <p style="margin-bottom: 18px;">
+          当时很多工作都在展示 LLM 能接工具，但缺少一个统一框架回答三个更硬的问题：
+          模型现阶段到底多会用工具、怎样才能把它训得更会用工具、以及它真正卡在哪里。
+        </p>
+        <div class="callout">
+          <h3>这篇论文最关键的转向</h3>
+          <p>
+            从“模型会不会输出一段 API 调用格式”转向“模型在一个可执行环境里，能不能完成真实的工具增强任务”。
+          </p>
+        </div>
+      </div>
+
+      <div class="cards-grid reveal">
+        <div class="note-card">
+          <strong>真实任务导向</strong>
+          <p>不仅测 API call 字符串是否像样，还要看执行后是否真的满足用户意图。</p>
+        </div>
+        <div class="note-card">
+          <strong>能力层级导向</strong>
+          <p>把 tool use 拆成 call、retrieve+call、plan+retrieve+call，而不是一个总分。</p>
+        </div>
+        <div class="note-card">
+          <strong>训练可闭环</strong>
+          <p>不仅做 benchmark，还给出训练数据和 Lynx 微调结果来验证数据集是否有用。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="abilities">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">Ability Ladder</div>
+        <h2>论文最重要的拆法：三层工具使用能力</h2>
+        <p>
+          API-Bank 最有生命力的设计，不是它的数据量，而是它把 tool use 拆成三个难度层级。
+          这让你能看清模型到底是不会调用、不会找工具，还是不会规划。
+        </p>
+      </div>
+
+      <div class="ability-controls reveal">
+        <button class="ability-btn active" data-target="call">Call</button>
+        <button class="ability-btn" data-target="retrieve">Retrieve + Call</button>
+        <button class="ability-btn" data-target="plan">Plan + Retrieve + Call</button>
+      </div>
+
+      <div class="ability-panel active" id="call">
+        <div class="ability-card reveal">
+          <h3>Call：已知 API 时，模型能不能正确调用？</h3>
+          <p>
+            这是最低层级，问题通常是格式、参数和值是否正确。这里更像 instruction following + 参数填充。
+          </p>
+          <div class="metric-line"><span>难点</span><span>格式、参数、约束理解</span></div>
+          <div class="bar"><span style="width: 40%"></span></div>
+          <div class="metric-line"><span>适合测什么</span><span>调用规范性、参数抽取、基本工具意识</span></div>
+        </div>
+      </div>
+
+      <div class="ability-panel" id="retrieve">
+        <div class="ability-card">
+          <h3>Retrieve + Call：不知道用哪个 API 时，能不能先找对再调用？</h3>
+          <p>
+            这已经不只是格式问题，而是工具检索问题。模型必须理解需求，匹配 API 描述，再完成调用。
+          </p>
+          <div class="metric-line"><span>难点</span><span>工具检索、语义匹配、参数承接</span></div>
+          <div class="bar"><span style="width: 68%"></span></div>
+          <div class="metric-line"><span>适合测什么</span><span>tool retrieval、文档理解、API 选择</span></div>
+        </div>
+      </div>
+
+      <div class="ability-panel" id="plan">
+        <div class="ability-card">
+          <h3>Plan + Retrieve + Call：多步任务里，能不能自己规划工具链？</h3>
+          <p>
+            这是最像 agent 的部分。模型要把用户目标分解成多步，决定检索顺序和调用链条，最后再整合结果。
+          </p>
+          <div class="metric-line"><span>难点</span><span>规划、状态维持、多调用串联</span></div>
+          <div class="bar"><span style="width: 92%"></span></div>
+          <div class="metric-line"><span>适合测什么</span><span>agent planning、workflow orchestration、复杂工具链</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pipeline">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">Data Generation</div>
+        <h2>它怎么把训练数据造出来？五个 agent 分步协作</h2>
+        <p>
+          作者认为直接让一个 LLM 一口气同时满足“domain 多样性、API 真实性、能力层级、对话质量”几乎做不好，
+          所以把复杂标注任务拆成了五个更简单的 agent。
+        </p>
+      </div>
+
+      <div class="pipeline-layout reveal">
+        <div class="pipeline-menu">
+          <button class="pipeline-btn active" data-target="agent-1">Agent 1 · 造 domain</button>
+          <button class="pipeline-btn" data-target="agent-2">Agent 2 · 造 API</button>
+          <button class="pipeline-btn" data-target="agent-3">Agent 3 · 造 query</button>
+          <button class="pipeline-btn" data-target="agent-4">Agent 4 · 造调用</button>
+          <button class="pipeline-btn" data-target="agent-5">Agent 5 · 做 tester</button>
+        </div>
+
+        <div>
+          <div class="pipeline-card active" id="agent-1">
+            <div class="pipeline-step">Step 1</div>
+            <h3>先生成领域</h3>
+            <p>先把任务空间切成大量真实 domain，例如 healthcare、fitness、finance 等，为后续 API 和 query 提供语义边界。</p>
+          </div>
+          <div class="pipeline-card" id="agent-2">
+            <div class="pipeline-step">Step 2</div>
+            <h3>再生成 API 候选</h3>
+            <p>根据 domain 生成可能存在的 API。为了保证“像真实世界”，输入里加入了 Public APIs 示例来约束风格和命名。</p>
+          </div>
+          <div class="pipeline-card" id="agent-3">
+            <div class="pipeline-step">Step 3</div>
+            <h3>选 API 与能力，再写 query</h3>
+            <p>第三个 agent 结合“选中的 API + 指定能力层级”去写 query，从而保证样本能覆盖 call / retrieve / plan 三类难度。</p>
+          </div>
+          <div class="pipeline-card" id="agent-4">
+            <div class="pipeline-step">Step 4</div>
+            <h3>模拟 API 调用和响应</h3>
+            <p>第四个 agent 负责生成工具调用轨迹和执行后响应，把 query 映射成具体的 API interaction。</p>
+          </div>
+          <div class="pipeline-card" id="agent-5">
+            <div class="pipeline-step">Step 5</div>
+            <h3>最后由 tester 自动过滤</h3>
+            <p>第五个 agent 负责检查数据是否满足设计原则。论文里提到它丢弃了约 35% 的样本，保证最终质量。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout reveal" style="margin-top: 24px;">
+        <h3>这一步为什么重要</h3>
+        <p>
+          这其实是在做“合成训练数据的任务分解”。如果你要自建 tool-use 数据集，这篇论文最值得借的，
+          不是它的 prompt 细节，而是“把复杂标注流程拆成多个职责明确的 agent”这个思路。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="results">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">Results</div>
+        <h2>实验告诉了我们什么？</h2>
+        <p>
+          最重要的信号不是谁分最高，而是能力一上升到规划与检索，模型性能会急剧掉下去。
+        </p>
+      </div>
+
+      <div class="result-grid reveal">
+        <div class="result-card">
+          <div class="tag">GPT-3.5-turbo · Total Correctness</div>
+          <div class="score" style="color: var(--color-info);">47.16%</div>
+          <p>已明显强于早期开源模型，但在最难的 Plan+Retrieve+Call 上只有 22.00%。</p>
+        </div>
+        <div class="result-card">
+          <div class="tag">GPT-4 · Total Correctness</div>
+          <div class="score" style="color: var(--color-success);">60.24%</div>
+          <p>在规划型 tool use 上大幅领先，Plan+Retrieve+Call 达到 70.00%。</p>
+        </div>
+        <div class="result-card">
+          <div class="tag">Lynx-7B · Total Correctness</div>
+          <div class="score" style="color: var(--color-accent);">39.58%</div>
+          <p>相对 Alpaca-7B 的 15.19%，说明 API-Bank 训练集确实有效，但离闭环 agent 仍有距离。</p>
+        </div>
+      </div>
+
+      <div class="table-wrap reveal">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Call</th>
+              <th>Retrieve+Call</th>
+              <th>Plan+Retrieve+Call</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alpaca-7B</td>
+              <td>24.06%</td>
+              <td>5.19%</td>
+              <td>0.00%</td>
+              <td>15.19%</td>
+            </tr>
+            <tr>
+              <td>GPT-3.5-turbo</td>
+              <td>59.40%</td>
+              <td>38.52%</td>
+              <td>22.00%</td>
+              <td>47.16%</td>
+            </tr>
+            <tr>
+              <td>GPT-4</td>
+              <td>63.66%</td>
+              <td>37.04%</td>
+              <td>70.00%</td>
+              <td>60.24%</td>
+            </tr>
+            <tr>
+              <td>Lynx-7B</td>
+              <td>49.87%</td>
+              <td>30.37%</td>
+              <td>20.00%</td>
+              <td>39.58%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout reveal" style="margin-top: 24px;">
+        <h3>读表时最重要的判断</h3>
+        <p>
+          不能把 tool use 当成单一能力。API 调用格式学会了，不代表模型会检索 API；会检索 API，也不代表模型能跨多步规划工具链。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="errors">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">Error Analysis</div>
+        <h2>错误分析比总分更值钱</h2>
+        <p>
+          论文最有工程价值的一部分，是它没有只停在 accuracy，而是区分出不同模型的失败模式。
+        </p>
+      </div>
+
+      <div class="error-tabs reveal">
+        <button class="pipeline-btn active" data-target="error-alpaca">Alpaca</button>
+        <button class="pipeline-btn" data-target="error-lynx">Lynx</button>
+        <button class="pipeline-btn" data-target="error-gpt4">GPT-4</button>
+      </div>
+
+      <div class="error-panel active" id="error-alpaca">
+        <div class="error-list reveal">
+          <div class="error-item"><strong>No API Call</strong><span>36.77%</span></div>
+          <div class="error-item"><strong>False API Call Format</strong><span>23.65%</span></div>
+          <div class="error-item"><strong>API Hallucination</strong><span>15.93%</span></div>
+        </div>
+      </div>
+
+      <div class="error-panel" id="error-lynx">
+        <div class="error-list">
+          <div class="error-item"><strong>API Hallucination</strong><span>61.38%</span></div>
+          <div class="error-item"><strong>Has Exception</strong><span>16.40%</span></div>
+          <div class="error-item"><strong>Invalid Input Parameters</strong><span>8.47%</span></div>
+        </div>
+      </div>
+
+      <div class="error-panel" id="error-gpt4">
+        <div class="error-list">
+          <div class="error-item"><strong>Failed API Retrieval</strong><span>67.86%</span></div>
+          <div class="error-item"><strong>False API Call Format</strong><span>17.86%</span></div>
+          <div class="error-item"><strong>Invalid Input Parameters</strong><span>7.14%</span></div>
+        </div>
+      </div>
+
+      <div class="cards-grid reveal" style="margin-top: 24px;">
+        <div class="note-card">
+          <strong>Alpaca 的问题</strong>
+          <p>它经常连 API 都不调，说明普通 instruction tuning 还不足以让模型形成稳定工具意识。</p>
+        </div>
+        <div class="note-card">
+          <strong>Lynx 的问题</strong>
+          <p>微调后“愿意调工具”了，但会开始幻想 API 或选错 API，工具幻觉成为主障碍。</p>
+        </div>
+        <div class="note-card">
+          <strong>GPT-4 的问题</strong>
+          <p>不是不会调，而是先没找对工具。这说明高能力模型的瓶颈更像 retrieval/planning，而非格式。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="takeaways">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">Decision Output</div>
+        <h2>这篇论文对你真正有用的三件事</h2>
+        <p>
+          如果你是为了做 agent、RAG + tools、或者 API 调用训练，这篇论文最该带走的是下面这些可迁移结构。
+        </p>
+      </div>
+
+      <div class="takeaway-grid reveal">
+        <div class="takeaway-card">
+          <h3>1. 能力拆分框架</h3>
+          <p>把 tool use 分成调用、检索、规划三个层级，是做评测和训练设计时非常实用的基本框架。</p>
+        </div>
+        <div class="takeaway-card">
+          <h3>2. 可执行评测系统</h3>
+          <p>如果 benchmark 不执行工具，只看文本输出，你往往测到的是“格式能力”，不是“任务完成能力”。</p>
+        </div>
+        <div class="takeaway-card">
+          <h3>3. 错误类型化</h3>
+          <p>比起一个总分，更应区分 No Call、Hallucination、Retrieval Failure、Invalid Parameters 等失效模式。</p>
+        </div>
+      </div>
+
+      <div class="callout reveal" style="margin-top: 24px;">
+        <h3>我的判断</h3>
+        <p>
+          API-Bank 到今天依然值得读，不是因为它是最终答案，而是因为它把“工具增强 LLM”这件事第一次较系统地拆清楚了。
+          如果你要做自建 tool-use benchmark、数据合成、API 调用训练，这篇是很好的起点。
+        </p>
+      </div>
+
+      <div class="footer-note reveal">
+        <span>本页基于论文《API-Bank: A Comprehensive Benchmark for Tool-Augmented LLMs》整理</span>
+        <span>建议继续连读：ToolLLM、Gorilla、ToolSandbox</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="quiz">
+    <div class="container">
+      <div class="reveal">
+        <div class="eyebrow">Scenario Quiz</div>
+        <h2>测一测：你真的抓到重点了吗？</h2>
+        <p>这不是考记忆，而是看你是否抓住了论文的结构性判断。</p>
+      </div>
+
+      <div class="quiz-grid reveal">
+        <div class="quiz-card" data-correct="b">
+          <h3>如果一个模型在 Call 很强，但在 Retrieve+Call 很差，这更可能说明什么？</h3>
+          <button class="quiz-option" data-value="a">它不会输出 API 参数</button>
+          <button class="quiz-option" data-value="b">它更可能卡在 API 检索或选择，而不是格式</button>
+          <button class="quiz-option" data-value="c">它根本不具备 instruction following 能力</button>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <div class="quiz-card" data-correct="c">
+          <h3>API-Bank 相比很多早期工具基准，最重要的方法论提升是什么？</h3>
+          <button class="quiz-option" data-value="a">把 API 数量做得更多</button>
+          <button class="quiz-option" data-value="b">只看 response 的 Rouge-L</button>
+          <button class="quiz-option" data-value="c">把 tool use 变成可执行、可分层、可错误分析的任务</button>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <div class="quiz-card" data-correct="a">
+          <h3>如果你要自建一个 tool-use 数据集，最值得借 API-Bank 的是哪部分？</h3>
+          <button class="quiz-option" data-value="a">把复杂标注过程拆成多个 agent 分步完成</button>
+          <button class="quiz-option" data-value="b">只保留单轮对话，减少成本</button>
+          <button class="quiz-option" data-value="c">完全放弃人工测试样本</button>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.topbar a'));
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.16 });
+
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${entry.target.id}`);
+        });
+      });
+    }, { threshold: 0.5 });
+
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    document.querySelectorAll('.ability-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ability-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.ability-panel').forEach((panel) => panel.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.target).classList.add('active');
+      });
+    });
+
+    function wireTabbedControls(buttonSelector, panelSelector) {
+      const buttons = Array.from(document.querySelectorAll(buttonSelector));
+      const panels = Array.from(document.querySelectorAll(panelSelector));
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = button.dataset.target;
+          buttons.forEach((b) => b.classList.remove('active'));
+          panels.forEach((p) => p.classList.remove('active'));
+          button.classList.add('active');
+          document.getElementById(target).classList.add('active');
+        });
+      });
+    }
+
+    wireTabbedControls('.pipeline-menu .pipeline-btn', '.pipeline-card');
+    wireTabbedControls('.error-tabs .pipeline-btn', '.error-panel');
+
+    const explanations = {
+      b: '对。Call 更像格式与参数问题，Retrieve+Call 差往往意味着模型不会先找到合适 API。',
+      c: '对。API-Bank 真正强的是把 benchmark 做成了分层、可执行、可做错误分析的系统。',
+      a: '对。五 agent 分解复杂标注流程，是它对数据合成工作流最可迁移的地方。'
+    };
+
+    document.querySelectorAll('.quiz-card').forEach((card) => {
+      card.querySelectorAll('.quiz-option').forEach((option) => {
+        option.addEventListener('click', () => {
+          const correct = card.dataset.correct;
+          const feedback = card.querySelector('.quiz-feedback');
+          card.querySelectorAll('.quiz-option').forEach((btn) => {
+            btn.disabled = true;
+            if (btn.dataset.value === correct) btn.classList.add('correct');
+          });
+          if (option.dataset.value !== correct) {
+            option.classList.add('wrong');
+            feedback.textContent = '不对。重点是看它卡在“检索/选择/结构化任务完成”哪一层，而不是只盯输出格式。';
+            if (correct === 'c') feedback.textContent = '不对。关键不只是数量，而是 API-Bank 把 task 变成了可执行、可分层评测。';
+            if (correct === 'a') feedback.textContent = '不对。最值得借的是多 agent 拆任务，不是把数据做得更简单。';
+          } else {
+            option.classList.add('correct');
+            feedback.textContent = explanations[correct];
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
