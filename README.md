@@ -1,4 +1,4 @@
-#致谢张咋了开源的codebase-to-course ： https://github.com/zarazhangrui/codebase-to-course
+# 致谢张咋啦开源的codebase-to-course ： https://github.com/zarazhangrui/codebase-to-course
 
 # paper-reading
 
