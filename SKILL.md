@@ -50,6 +50,7 @@ This skill does **not** produce generic abstract paraphrases. It produces output
 - What problem is this paper actually solving?
 - What exactly is the claimed contribution?
 - How does the method work at the mechanism level?
+- Which figures carry the core meaning of the paper?
 - What evidence is strong, weak, or missing?
 - Which assumptions are hidden?
 - Where would this break in practice?
@@ -85,6 +86,7 @@ Use when the user wants a fast summary, triage, or "值不值得看".
 Output:
 - One-paragraph thesis
 - 3-5 bullet contribution summary
+- 1-2 key figures or tables and why they matter
 - Why it matters
 - Biggest caveat
 - Whether it is worth deeper reading
@@ -97,6 +99,7 @@ Output:
 - Problem and setting
 - Core idea
 - Method mechanism
+- Figure-first walkthrough of the paper's most important visuals
 - Experimental setup
 - Main results
 - Strengths, weaknesses, hidden assumptions
@@ -110,6 +113,7 @@ Output:
 - Side-by-side comparison table
 - Shared problem framing
 - Key differences in method, data, evaluation, and tradeoffs
+- Which figure from each paper best captures the real delta
 - Which paper to use as the anchor reference and why
 
 ### 4. Literature Seed Map
@@ -130,6 +134,7 @@ Output:
 - Required ingredients: data, model, tools, compute, evaluation
 - Ambiguities likely to block reproduction
 - Risks of hidden tuning or unavailable resources
+- Which figures hide implementation-critical details
 - A practical reproduction plan
 
 ### 6. HTML Reading Page
@@ -139,8 +144,11 @@ Use when the user wants the paper turned into a visual, interactive reading page
 Output:
 - A single self-contained HTML file
 - Scroll-based sections that explain the paper progressively
-- Interactive elements such as ability toggles, method stepper, result cards, error-analysis tabs, and application-oriented quizzes
+- Interactive elements such as figure spotlight panels, ability toggles, method stepper, result cards, error-analysis tabs, and application-oriented quizzes
 - A visual structure that helps the reader grasp problem, mechanism, evidence, and decision takeaway quickly
+- When the source PDF or page is locally accessible, embed the real paper figures/tables whenever feasible instead of only paraphrasing them
+- Prefer high-resolution crops of the relevant figure/table region over full-page screenshots
+- Preserve the original figure/table caption whenever feasible; if you crop it out, add a clearly labeled reproduction of the caption nearby
 
 ## The Process (4 Phases)
 
@@ -166,12 +174,23 @@ Write a one-sentence thesis in plain language before doing anything else. If you
 
 Understand the paper at the level where someone could explain it, critique it, or begin implementing it.
 
+Before writing the mechanism explanation, identify the **2-4 figures or tables that carry the paper's actual meaning**. In many papers, the fastest route to understanding is:
+
+1. Read the abstract and introduction for the claim
+2. Read the key figures for the mechanism and evidence
+3. Then read the method and experiment sections to verify the details
+
+Treat figures as first-class evidence, not decoration.
+
 Extract:
 - Inputs, outputs, assumptions, and constraints
 - The pipeline or algorithm flow
 - What is genuinely new versus assembled from prior work
 - Training recipe, prompting setup, retrieval strategy, tool loop, or system architecture as relevant
 - Datasets, benchmarks, metrics, baselines, and ablations
+- Which figure explains the pipeline best
+- Which figure or table best supports the main empirical claim
+- Which figure, if any, reveals limitations, tradeoffs, or error modes
 
 Prefer explaining mechanism as a sequence:
 
@@ -180,6 +199,15 @@ Prefer explaining mechanism as a sequence:
 3. What supervision or feedback shapes it
 4. What comes out
 5. How success is measured
+
+For each important figure, answer:
+
+1. What is this figure trying to show?
+2. Why did the authors include it?
+3. What should the reader notice first?
+4. Does it genuinely support the surrounding claim, or is it mainly illustrative?
+
+For HTML reading pages, if the paper is locally accessible, extract and embed the actual figure/table regions for the 1-3 most important visuals. Prefer clean high-resolution crops and preserve the original captions whenever possible.
 
 ### Phase 3: Judge the Evidence
 
@@ -193,6 +221,8 @@ Check:
 - Is the benchmark realistic or overly convenient?
 - Are there failure cases, uncertainty analysis, or cost tradeoffs?
 - Is the evaluation contaminated by data leakage, benchmark saturation, prompt tuning, or hand-crafted setup?
+- Do the paper's key figures and tables actually match the verbal claims around them?
+- Are there important visuals that look persuasive but carry weak evidence on close reading?
 
 If evidence is thin, say so plainly. Do not smooth over it.
 
@@ -217,6 +247,7 @@ Use the templates in `references/output-formats.md` when assembling the final an
 - Do not hide missing details. Missing training setup, data construction, or prompt templates are material facts.
 - Do not present inference as fact. Label it.
 - Do not overfit to headline numbers; inspect setting, baselines, and cost.
+- Do not ignore figures. In many papers, the core mechanism and the strongest or weakest evidence are concentrated there.
 
 ## What to Extract Every Time
 
@@ -226,6 +257,7 @@ Even in a short read, try to identify these:
 - **Claim**: what does the paper say it contributes?
 - **Mechanism**: how is the contribution operationalized?
 - **Evidence**: what experiments support the claim?
+- **Key Visuals**: which figures or tables carry the paper's central meaning, and what they really show
 - **Boundary**: where does the paper likely fail or not apply?
 - **Actionability**: what should the user do with this paper?
 
@@ -243,6 +275,7 @@ A weak output usually has one of these smells:
 - It only paraphrases the abstract and introduction
 - It never names hidden assumptions
 - It reports numbers without explaining the setup
+- It mentions figures only as citations, without explaining what the visuals actually prove
 - It cannot explain the core mechanism in plain language
 - It fails to distinguish contribution from packaging
 
@@ -276,6 +309,7 @@ When source material is available, anchor claims to concrete locations where pos
 Prefer phrases like:
 
 - "The paper argues..."
+- "Figure 3 is doing most of the explanatory work here..."
 - "In Table 2, the authors report..."
 - "A reasonable inference is..."
 - "The paper does not specify..."
@@ -302,6 +336,14 @@ Many papers package old ingredients with a new benchmark, prompt, or framing. Na
 ### Evidence Blindness
 
 A paper can sound compelling while being weakly evaluated. Always inspect baselines, metrics, ablations, and scope.
+
+### Figure Blindness
+
+Many summaries mention figures only as labels instead of reading them. Always inspect the figures that define the method, the main comparison, and the failure or tradeoff story. If you cannot explain the paper's key figure in plain language, the reading is not done.
+
+### Figure Description Without Figure
+
+For HTML reading pages, a common failure is to talk about Figure 1 / Table 1 / Figure 2 without actually showing them, even when the PDF is locally available. If the visual is available, embed it. Prefer a clean high-resolution crop of the figure/table region, and preserve the original caption when possible. Full-page screenshots are a fallback, not the default.
 
 ### Missing Boundary Conditions
 

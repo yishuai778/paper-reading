@@ -16,6 +16,11 @@ Use for triage, first pass, or "值不值得看".
 - 方法：
 - 证据：
 
+## 关键图
+- Figure / Table：
+- 它在说明什么：
+- 为什么值得先看：
+
 ## 为什么重要
 - [对研究或工程的实际意义]
 
@@ -47,6 +52,16 @@ Use when the user wants a full paper breakdown.
 2. 中间关键步骤是什么
 3. 训练/推理时怎样工作
 4. 输出是什么
+
+## 关键图解
+- Figure / Table 1：
+  它展示了什么：
+  读这张图时最该注意什么：
+  它是否真的支撑正文 claim：
+- Figure / Table 2：
+  它展示了什么：
+  读这张图时最该注意什么：
+  它是否真的支撑正文 claim：
 
 ## 实验与证据
 - 数据/benchmark：
@@ -81,6 +96,10 @@ Recommended columns:
 Then add:
 
 ```markdown
+## 各论文代表图
+- [paper]：最值得看的 Figure / Table 是什么，它抓住了什么核心差异
+- [paper]：最值得看的 Figure / Table 是什么，它抓住了什么核心差异
+
 ## 关键差异
 - 方法差异：
 - 评测差异：
@@ -139,6 +158,11 @@ Use when the user wants implementation value, not just understanding.
 ## 高风险缺口
 - [论文未交代清楚的点]
 
+## 图里藏着什么
+- 哪张图或表最接近实现细节
+- 哪张图看起来强，但其实不足以支持 claim
+- 哪张图能帮助确定复现优先级
+
 ## 建议实施路径
 1. 先搭最小闭环
 2. 再补齐 benchmark / 工具 / 数据
@@ -147,6 +171,28 @@ Use when the user wants implementation value, not just understanding.
 ## 预期难度
 - 低 / 中 / 高
 - 原因：
+```
+
+## 6. HTML Reading Page
+
+Use when the user wants a visual reading artifact rather than plain notes.
+
+Recommended sections:
+
+```markdown
+## 页面结构
+- Hero: 论文定位 + 一句话 thesis
+- Problem: 这篇论文为什么存在
+- Method: 用步骤化或流程图讲机制
+- Evidence: 重点图表 + 你的判断
+- Limits: 局限、假设、失败边界
+- Decision: 值不值得复现 / 借鉴 / 忽略
+
+## 图表要求
+- 关键 Figure / Table 尽量直接展示论文原图，而不是只写解释
+- 优先使用高分辨率图表区域裁图，不默认使用整页截图
+- 尽量保留原始 caption；如果图和 caption 分开，页面里要明确补上 caption
+- 如果本地图源可用，不要只描述 Figure 1 / Table 1 而不展示它
 ```
 
 ## Evidence Markers
@@ -158,3 +204,19 @@ When useful, tag statements inline:
 - `论文未说明` for missing but important details
 
 Use these markers sparingly but clearly, especially in reproduction and critique outputs.
+
+## Figure Analysis Rule
+
+When the source includes figures or tables, do not just cite them.
+
+For every important visual you mention, explain:
+
+- what the visual contains
+- what point the authors are trying to make with it
+- whether it actually supports that point
+
+For HTML reading pages, also ensure:
+
+- the real paper figure/table is shown whenever feasible
+- high-resolution crops are preferred over full-page screenshots
+- the original caption is preserved or clearly reproduced nearby
